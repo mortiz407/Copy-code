@@ -23,7 +23,7 @@
         $userNo = $_POST['user_no'];
         $add = isset($_POST['add']);
         $update = isset($_POST['update']);
-        $edit = isset($_POST['edite']);
+        $edit = isset($_POST['edit']);
         $delete = isset($_POST['delete']);
     }
 
