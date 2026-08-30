@@ -1,0 +1,233 @@
+table {
+    border-spacing: 5px;
+}
+
+table, th, td {
+    border: 1px solid black;
+    border-collapse: collapse;
+}
+
+th, td {
+    padding: 15px;
+    text-align: center;
+}
+
+th {
+    background-color: lightskyblue;
+}
+
+tr:nth-child(even) {
+    background-color: whitesmoke;
+}
+
+tr:nth-child(odd) {
+    background-color: lightgray;
+}
+
+<?php
+// Connect to Database
+$hostname = 'localhost';
+$username = 'ecpi_user';
+$password = 'Password1';
+$dbname   = 'sdc310_midterm';
+$conn     = mysqli_connect($hostname, $username, $password, $dbname);
+
+// Model Functions
+function add_user($conn, $firstName, $lastName, $street, $city, $state, $zip) {
+    $addQuery = "INSERT INTO
+        userinfo (FirstName, LastName, Street, City, State, ZipCode)
+        VALUES ('$firstName', '$lastName', '$street', '$city', '$state', '$zip')";
+    return mysqli_query($conn, $addQuery);
+}
+
+function get_user($conn, $addressNo) {
+    $selQuery = "SELECT * FROM userinfo WHERE AddressNo = $addressNo";
+    $result = mysqli_query($conn, $selQuery);
+    return mysqli_fetch_assoc($result);
+}
+
+function update_user($conn, $addressNo, $firstName, $lastName, $street, $city, $state, $zip) {
+    $updQuery = "UPDATE userinfo SET
+        FirstName = '$firstName', LastName = '$lastName',
+        Street = '$street', City = '$city',
+        State = '$state', ZipCode = '$zip'
+        WHERE AddressNo = $addressNo";
+    return mysqli_query($conn, $updQuery);
+}
+
+function delete_user($conn, $addressNo) {
+    $delQuery = "DELETE FROM userinfo WHERE AddressNo = $addressNo";
+    return mysqli_query($conn, $delQuery);
+}
+
+function get_all_users($conn) {
+    $query = "SELECT * FROM userinfo";
+    return mysqli_query($conn, $query);
+}
+?>
+
+
+<?php
+require_once('model.php');
+
+// Establish variables to support add/edit/delete
+$addressNo = -1;
+$firstName = "";
+$lastName = "";
+$street = "";
+$city = "";
+$state = "";
+$zip = "";
+
+// Variables to determine the type of operation
+$add = false;
+$edit = false;
+$update = false;
+$delete = false;
+
+if (isset($_POST['address_no'])) {
+    $addressNo = $_POST['address_no'];
+    $add = isset($_POST['add']);
+    $update = isset($_POST['update']);
+    $edit = isset($_POST['edit']);
+    $delete = isset($_POST['delete']);
+}
+
+if ($add) {
+    // Need to add a new user
+    $firstName = $_POST['first_name'];
+    $lastName = $_POST['last_name'];
+    $street = $_POST['street_name'];
+    $city = $_POST['city'];
+    $state = $_POST['state'];
+    $zip = $_POST['zip_code'];
+
+    add_user($conn, $firstName, $lastName, $street, $city, $state, $zip);
+
+    // Clear the fields
+    $addressNo = -1;
+    $firstName = "";
+    $lastName = "";
+    $street = "";
+    $city = "";
+    $state = "";
+    $zip = "";
+}
+else if ($edit) {
+    // Get the user information
+    $userInfo = get_user($conn, $addressNo);
+
+    // Fill in the values to allow edit
+    $firstName = $userInfo['FirstName'];
+    $lastName = $userInfo['LastName'];
+    $street = $userInfo['Street'];
+    $city = $userInfo['City'];
+    $state = $userInfo['State'];
+    $zip = $userInfo['ZipCode'];
+}
+else if ($update) {
+    // Update values submitted
+    $firstName = $_POST['first_name'];
+    $lastName = $_POST['last_name'];
+    $street = $_POST['street_name'];
+    $city = $_POST['city'];
+    $state = $_POST['state'];
+    $zip = $_POST['zip_code'];
+
+    update_user($conn, $addressNo, $firstName, $lastName, $street, $city, $state, $zip);
+
+    // Clear the fields
+    $addressNo = -1;
+    $firstName = "";
+    $lastName = "";
+    $street = "";
+    $city = "";
+    $state = "";
+    $zip = "";
+}
+else if ($delete) {
+    // Need to delete the selected user
+    delete_user($conn, $addressNo);
+    $addressNo = -1;
+}
+
+// Query for all users to display in the table
+$result = get_all_users($conn);
+
+// Load View
+include('view.php');
+?>
+
+<!DOCTYPE html>
+<html>
+    <head>
+        <title>Manuel Ortiz Wk 3 Midterm</title>
+        <link rel="stylesheet" href="style.css">
+    </head>
+
+    <body>
+        <h2>User Information:</h2>
+        <table>
+            <tr style="font-size: large;">
+                <th>Address #</th>
+                <th>First Name</th>
+                <th>Last Name</th>
+                <th>Street Address</th>
+                <th>City</th>
+                <th>State</th>
+                <th>Zip Code</th>
+                <th></th>
+                <th></th>
+            </tr>
+
+            <?php while($row = mysqli_fetch_array($result)):;?>
+                <tr>
+                    <td><?php echo $row["AddressNo"];?></td>
+                    <td><?php echo $row["FirstName"];?></td>
+                    <td><?php echo $row["LastName"];?></td>
+                    <td><?php echo $row["Street"];?></td>
+                    <td><?php echo $row["City"];?></td>
+                    <td><?php echo $row["State"];?></td>
+                    <td><?php echo $row['ZipCode'];?></td>
+                    <td>
+                        <form method='POST' action='index.php'>
+                            <input type="submit" value="Edit" name="edit">
+                            <input type="hidden"
+                                value="<?php echo $row["AddressNo"]; ?>"
+                                name="address_no">
+                        </form>
+                    </td>
+                    <td>
+                        <form method='POST' action='index.php'>
+                            <input type="submit" value="Delete" name="delete">
+                            <input type="hidden"
+                                value="<?php echo $row["AddressNo"]; ?>"
+                                name="address_no">
+                        </form>
+                    </td>  
+                </tr>
+            <?php endwhile;?>
+        </table>
+
+        <form method='POST' action='index.php'>
+            <input type="hidden" value="<?php echo $addressNo; ?>" name="address_no">
+            <h3>Enter your first name: <input type="text" name="first_name"
+                value="<?php echo $firstName; ?>"></h3>
+            <h3>Enter your last name: <input type="text" name="last_name"
+                value="<?php echo $lastName; ?>"></h3>
+            <h3>Enter your street address: <input type="text" name="street_name"
+                value="<?php echo $street; ?>"></h3>
+            <h3>Enter your city: <input type="text" name="city"
+                value="<?php echo $city; ?>"></h3>
+            <h3>Enter your state: <input type="text" name="state" placeholder="NY"
+                value="<?php echo $state; ?>"></h3>
+            <h3>Enter your zip code: <input type="text" name="zip_code"
+                value="<?php echo $zip; ?>"></h3>
+            <?php if (!$edit): ?>
+                <input type="submit" value="Add Info" name="add">
+            <?php else: ?>
+                <input type="submit" value="Update Info" name="update">
+            <?php endif; ?>
+        </form>
+    </body>
+</html>
