@@ -1,3 +1,18 @@
+    <string name="app_name">Contacts Mobile App</string>
+    <string name="txt_letter_A">A</string>
+    <string name="btn_details">View Details</string>
+    <string name="txt_name1">Manuel Apple</string>
+    <string name="txt_address1">123 Main St, San Antonio, Tx 98765</string>
+    <string name="txt_phonenum1">(123)-456-7899</string>
+    <string name="txt_email1">manort0727@students.ecpi.edu</string>
+    <string name="txt_name2">Siwar Apple</string>
+    <string name="txt_address2">456 Uptown, San Antonio, Tx 98756</string>
+    <string name="txt_phonenum2">(987)-654-3211</string>
+    <string name="txt_email2">siwort0727@students.ecpi.edu</string>
+    <string name="btn_back">Back</string>
+
+
+
 package com.example.contactsmobileapp
 
 import android.content.Intent
