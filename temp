@@ -1,0 +1,202 @@
+<resources>
+    <string name="app_name">Manuel Ortiz - Temperature Conversion</string>
+    <string name="txt_title">Temperature Converter</string>
+    <string name="hint_temp">Enter Temperature</string>
+    <string name="rad_f_to_c">Fahrenheit (°F) to Celsius (°C)</string>
+    <string name="rad_c_to_f">Celsius (°C) to Fahrenheit (°F)</string>
+    <string name="btn_convert">Convert Temperature</string>
+    <string name="img_desc">Thermometer graphic</string>
+</resources>
+
+
+
+
+
+<resources xmlns:tools="http://schemas.android.com/tools">
+    <style name="Base.Theme.PATemperatureConversion" parent="Theme.Material3.DayNight">
+        <!-- Customize your theme here. -->
+    </style>
+
+    <style name="Theme.PATemperatureConversion" parent="Base.Theme.PATemperatureConversion" />
+</resources>
+
+
+
+
+
+<?xml version="1.0" encoding="utf-8"?>
+<androidx.constraintlayout.widget.ConstraintLayout xmlns:android="http://schemas.android.com/apk/res/android"
+    xmlns:app="http://schemas.android.com/apk/res-auto"
+    xmlns:tools="http://schemas.android.com/tools"
+    android:id="@+id/main"
+    android:layout_width="match_parent"
+    android:layout_height="match_parent"
+    android:padding="16dp"
+    tools:context=".MainActivity">
+
+    <ImageView
+        android:id="@+id/imgThermometer"
+        android:layout_width="110dp"
+        android:layout_height="110dp"
+        android:layout_marginTop="12dp"
+        android:contentDescription="@string/img_desc"
+        android:src="@drawable/img_thermometer"
+        app:layout_constraintEnd_toEndOf="parent"
+        app:layout_constraintStart_toStartOf="parent"
+        app:layout_constraintTop_toTopOf="parent" />
+
+    <TextView
+        android:id="@+id/txtTitle"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:layout_marginTop="12dp"
+        android:text="@string/txt_title"
+        android:textColor="#1565C0"
+        android:textSize="28sp"
+        android:textStyle="bold"
+        app:layout_constraintEnd_toEndOf="parent"
+        app:layout_constraintStart_toStartOf="parent"
+        app:layout_constraintTop_toBottomOf="@+id/imgThermometer" />
+
+    <EditText
+        android:id="@+id/txtTemp"
+        android:layout_width="0dp"
+        android:layout_height="wrap_content"
+        android:layout_marginTop="16dp"
+        android:gravity="center"
+        android:hint="@string/hint_temp"
+        android:inputType="numberDecimal|numberSigned"
+        android:minHeight="48dp"
+        android:textSize="22sp"
+        app:layout_constraintEnd_toEndOf="parent"
+        app:layout_constraintStart_toStartOf="parent"
+        app:layout_constraintTop_toBottomOf="@+id/txtTitle" />
+
+    <RadioGroup
+        android:id="@+id/radioGroup"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:layout_marginTop="16dp"
+        app:layout_constraintEnd_toEndOf="parent"
+        app:layout_constraintStart_toStartOf="parent"
+        app:layout_constraintTop_toBottomOf="@+id/txtTemp">
+
+        <RadioButton
+            android:id="@+id/radFToC"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:checked="true"
+            android:text="@string/rad_f_to_c"
+            android:textSize="16sp" />
+
+        <RadioButton
+            android:id="@+id/radCToF"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:checked="false"
+            android:text="@string/rad_c_to_f"
+            android:textSize="16sp" />
+    </RadioGroup>
+
+    <Button
+        android:id="@+id/btnConvert"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:layout_marginTop="16dp"
+        android:text="@string/btn_convert"
+        android:textSize="20sp"
+        app:layout_constraintEnd_toEndOf="parent"
+        app:layout_constraintStart_toStartOf="parent"
+        app:layout_constraintTop_toBottomOf="@+id/radioGroup" />
+
+    <TextView
+        android:id="@+id/txtResult"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:layout_marginTop="24dp"
+        android:textColor="#D32F2F"
+        android:textSize="26sp"
+        android:textStyle="bold"
+        app:layout_constraintEnd_toEndOf="parent"
+        app:layout_constraintStart_toStartOf="parent"
+        app:layout_constraintTop_toBottomOf="@+id/btnConvert" />
+
+</androidx.constraintlayout.widget.ConstraintLayout>
+
+
+
+
+
+package com.example.patemperatureconversion
+
+import android.os.Bundle
+import android.widget.Button
+import android.widget.EditText
+import android.widget.RadioButton
+import android.widget.TextView
+import android.widget.Toast
+import androidx.appcompat.app.AppCompatActivity
+
+// Manuel Ortiz - Week 2 Performance Assessment: Temperature Conversion - November 22, 2026
+class MainActivity : AppCompatActivity() {
+    override fun onCreate(savedInstanceState: Bundle?) {
+        super.onCreate(savedInstanceState)
+        setContentView(R.layout.activity_main)
+
+        // Display custom icon in the Action Bar
+        val actionBar = supportActionBar
+        actionBar?.setIcon(R.mipmap.ic_launcher)
+        actionBar?.setDisplayUseLogoEnabled(true)
+        actionBar?.setDisplayShowHomeEnabled(true)
+
+        val btnConvert = findViewById<Button>(R.id.btnConvert)
+        val txtTemp = findViewById<EditText>(R.id.txtTemp)
+        val radFToC = findViewById<RadioButton>(R.id.radFToC)
+        val txtResult = findViewById<TextView>(R.id.txtResult)
+
+        btnConvert.setOnClickListener {
+            val inputText = txtTemp.text.toString().trim()
+
+            if (inputText.isEmpty()) {
+                Toast.makeText(this, "Please enter a temperature value.", Toast.LENGTH_LONG).show()
+                return@setOnClickListener
+            }
+
+            val enteredTemp = inputText.toDoubleOrNull()
+            if (enteredTemp == null) {
+                Toast.makeText(this, "Please enter a valid number.", Toast.LENGTH_LONG).show()
+                return@setOnClickListener
+            }
+
+            if (radFToC.isChecked) {
+                // Fahrenheit to Celsius: valid range is -100 to 250
+                if (enteredTemp in -100.0..250.0) {
+                    val celsius = (enteredTemp - 32.0) * (5.0 / 9.0)
+                    val formatted = String.format("%.1f", celsius)
+                    txtResult.text = "$formatted °C"
+                } else {
+                    txtResult.text = ""
+                    Toast.makeText(
+                        this,
+                        "Fahrenheit must be between -100°F and 250°F.",
+                        Toast.LENGTH_LONG
+                    ).show()
+                }
+            } else {
+                // Celsius to Fahrenheit: valid range is -75 to 125
+                if (enteredTemp in -75.0..125.0) {
+                    val fahrenheit = (enteredTemp * (9.0 / 5.0)) + 32.0
+                    val formatted = String.format("%.1f", fahrenheit)
+                    txtResult.text = "$formatted °F"
+                } else {
+                    txtResult.text = ""
+                    Toast.makeText(
+                        this,
+                        "Celsius must be between -75°C and 125°C.",
+                        Toast.LENGTH_LONG
+                    ).show()
+                }
+            }
+        }
+    }
+}
